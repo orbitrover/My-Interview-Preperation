@@ -1,0 +1,32 @@
+﻿@model Core.InterviewPrep.PostgreSQL.Models.Headings
+@{
+    Layout = null;
+}
+<input type="hidden" id="header" value="Edit Heading" />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="EditHeadings">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="HeadingId" />
+            <div class="form-group">
+                <label for="TopicId" class="control-label">Topic Name</label>
+                <select asp-for="TopicId" class="form-control" asp-items="ViewBag.TopicId"></select>
+                <span asp-validation-for="TopicId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HeadingName" class="control-label"></label>
+                <textarea asp-for="HeadingName" class="form-control" rows="10" cols="20">
+
+                </textarea>
+                <span asp-validation-for="HeadingName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-2">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+

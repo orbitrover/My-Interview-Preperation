@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "My Practices";
+}
+
+<div class="row">
+    <div class="col-md-12" id="replacetarget">
+    </div>
+</div>
+<script>
+    var topic_target = ''; var heading_target = ''; var question_target = '';
+    $(document).ready(function () {
+        $('#replacetarget').load('/Preps/TopicList', function () { CollapseAfterLoad('#collapse_1', '#collapse_h_1_1', '#collapse_q_1_1_1'); });
+    });
+    $(document).on("click", 'a[data-bs-toggle="collapse"]', function () {
+        createAccordianTargets(this);
+    });
+    function createAccordianTargets(obj, _middle = 'bs') {
+        topic_target = ''; heading_target = ''; question_target = '';
+        var collapse_type = $(obj).attr('data-' + _middle + '-type');
+        if (collapse_type != undefined && collapse_type != '') {
+            switch (collapse_type) {
+                case ('question'):
+                    question_target = $(obj).attr('data-' + _middle + '-target');
+                    heading_target = $(obj).closest('div.card-heading').find('a.col-heading').attr('data-bs-target');
+                    topic_target = $(obj).closest('div.card-topic').find('a.col-topic').attr('data-bs-target');
+                    console.log('question_target Id: ' + question_target);
+                    console.log('heading_target Id: ' + heading_target);
+                    console.log('topic_target Id: ' + topic_target);
+                    break;
+                case ('heading'):
+                    heading_target = $(obj).attr('data-' + _middle + '-target');
+                    topic_target = $(obj).closest('div.card-topic').find('a.col-topic').attr('data-bs-target');
+                    console.log('heading_target Id: ' + heading_target);
+                    console.log('topic_target Id: ' + topic_target);
+                    break;
+                case ('topic'):
+                    topic_target = $(obj).attr('data-' + _middle + '-target');
+                    console.log('topic_target Id: ' + topic_target);
+                    break;
+                default:
+                    console.log('No Target Found?');
+                    break;
+            }
+
+        }
+        else {
+            topic_target = '#collapse_1'; heading_target = '#collapse_h_1_1'; question_target = '#collapse_q_1_1_1';
+        }
+    }
+    function CollapseAfterLoad(topic, heading, question) {
+        if (topic != undefined && topic != '') {
+            $(topic).collapse('show');
+        }
+        if (heading != undefined && heading != '') {
+            $(heading).collapse('show');
+        }
+        if (question != undefined && question != '') {
+            $(question).collapse('show');
+        }
+    }
+
+    $(document).on('click', '#collapseall', function () {
+        $(this).find('i').toggleClass('fa-arrow-down');
+        $('#accordion .collapse').collapse('toggle');
+    });
+</script>

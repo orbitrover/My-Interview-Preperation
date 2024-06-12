@@ -1,0 +1,194 @@
+﻿
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div style="padding: 15px;">
+            <form id="form1" runat="server">
+                <div class="form-group">
+                    <label for="dropStyle" class="form-label">CSS Style</label>
+                    <select id="dropStyle" name="dropStyle" class="form-control form-control-sm" onchange="updateThemeStyle();">
+                        <option value="a11y-dark.min.css">a11y-dark.min.css</option>
+                        <option value="a11y-light.min.css">a11y-light.min.css</option>
+                        <option value="agate.min.css">agate.min.css</option>
+                        <option value="an-old-hope.min.css">an-old-hope.min.css</option>
+                        <option value="androidstudio.min.css">androidstudio.min.css</option>
+                        <option value="arduino-light.min.css">arduino-light.min.css</option>
+                        <option value="arta.min.css">arta.min.css</option>
+                        <option value="ascetic.min.css">ascetic.min.css</option>
+                        <option value="atom-one-dark-reasonable.min.css">atom-one-dark-reasonable.min.css</option>
+                        <option value="atom-one-dark.min.css">atom-one-dark.min.css</option>
+                        <option value="atom-one-light.min.css">atom-one-light.min.css</option>
+                        <option value="brown-paper.min.css">brown-paper.min.css</option>
+                        <option value="brown-papersq.png">brown-papersq.png</option>
+                        <option value="codepen-embed.min.css">codepen-embed.min.css</option>
+                        <option value="color-brewer.min.css">color-brewer.min.css</option>
+                        <option value="dark.min.css">dark.min.css</option>
+                        <option value="default.min.css">default.min.css</option>
+                        <option value="devibeans.min.css">devibeans.min.css</option>
+                        <option value="docco.min.css">docco.min.css</option>
+                        <option value="far.min.css">far.min.css</option>
+                        <option value="felipec.min.css">felipec.min.css</option>
+                        <option value="foundation.min.css">foundation.min.css</option>
+                        <option value="github-dark-dimmed.min.css">github-dark-dimmed.min.css</option>
+                        <option value="github-dark.min.css">github-dark.min.css</option>
+                        <option value="github.min.css">github.min.css</option>
+                        <option value="gml.min.css">gml.min.css</option>
+                        <option value="googlecode.min.css">googlecode.min.css</option>
+                        <option value="gradient-dark.min.css">gradient-dark.min.css</option>
+                        <option value="gradient-light.min.css">gradient-light.min.css</option>
+                        <option value="grayscale.min.css">grayscale.min.css</option>
+                        <option value="hybrid.min.css">hybrid.min.css</option>
+                        <option value="idea.min.css">idea.min.css</option>
+                        <option value="intellij-light.min.css">intellij-light.min.css</option>
+                        <option value="ir-black.min.css">ir-black.min.css</option>
+                        <option value="isbl-editor-dark.min.css">isbl-editor-dark.min.css</option>
+                        <option value="isbl-editor-light.min.css">isbl-editor-light.min.css</option>
+                        <option value="kimbie-dark.min.css">kimbie-dark.min.css</option>
+                        <option value="kimbie-light.min.css">kimbie-light.min.css</option>
+                        <option value="lightfair.min.css">lightfair.min.css</option>
+                        <option value="lioshi.min.css">lioshi.min.css</option>
+                        <option value="magula.min.css">magula.min.css</option>
+                        <option value="mono-blue.min.css">mono-blue.min.css</option>
+                        <option value="monokai-sublime.min.css">monokai-sublime.min.css</option>
+                        <option value="monokai.min.css">monokai.min.css</option>
+                        <option value="night-owl.min.css">night-owl.min.css</option>
+                        <option value="nnfx-dark.min.css">nnfx-dark.min.css</option>
+                        <option value="nnfx-light.min.css">nnfx-light.min.css</option>
+                        <option value="nord.min.css">nord.min.css</option>
+                        <option value="obsidian.min.css">obsidian.min.css</option>
+                        <option value="panda-syntax-dark.min.css">panda-syntax-dark.min.css</option>
+                        <option value="panda-syntax-light.min.css">panda-syntax-light.min.css</option>
+                        <option value="paraiso-dark.min.css">paraiso-dark.min.css</option>
+                        <option value="paraiso-light.min.css">paraiso-light.min.css</option>
+                        <option value="pojoaque.jpg">pojoaque.jpg</option>
+                        <option value="pojoaque.min.css">pojoaque.min.css</option>
+                        <option value="purebasic.min.css">purebasic.min.css</option>
+                        <option value="qtcreator-dark.min.css">qtcreator-dark.min.css</option>
+                        <option value="qtcreator-light.min.css">qtcreator-light.min.css</option>
+                        <option value="rainbow.min.css">rainbow.min.css</option>
+                        <option value="routeros.min.css">routeros.min.css</option>
+                        <option value="school-book.min.css">school-book.min.css</option>
+                        <option value="shades-of-purple.min.css">shades-of-purple.min.css</option>
+                        <option value="srcery.min.css">srcery.min.css</option>
+                        <option value="stackoverflow-dark.min.css">stackoverflow-dark.min.css</option>
+                        <option value="stackoverflow-light.min.css">stackoverflow-light.min.css</option>
+                        <option value="sunburst.min.css">sunburst.min.css</option>
+                        <option value="tokyo-night-dark.min.css">tokyo-night-dark.min.css</option>
+                        <option value="tokyo-night-light.min.css">tokyo-night-light.min.css</option>
+                        <option value="tomorrow-night-blue.min.css">tomorrow-night-blue.min.css</option>
+                        <option value="tomorrow-night-bright.min.css">tomorrow-night-bright.min.css</option>
+                        <option value="vs.min.css">vs.min.css</option>
+                        <option selected="selected" value="vs2015.min.css">vs2015.min.css</option>
+                        <option value="xcode.min.css">xcode.min.css</option>
+                        <option value="xt256.min.css">xt256.min.css</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dropFont" class="form-label">Font Name</label>
+                    <select id="dropFont" name="dropFont" class="form-control  form-control-sm" onchange="updateFont();">
+                        <option value="Roboto+Mono">Roboto Mono</option>
+                        <option value="Consolas">Consolas</option>
+                        <option value="Cascadia Mono">Cascadia Mono</option>
+                        <option value="Inconsolata">Inconsolata</option>
+                        <option value="Source+Code+Pro">Source Code Pro</option>
+                        <option value="IBM+Plex+Mono">IBM Plex Mono</option>
+                        <option value="Space+Mono">Space Mono</option>
+                        <option value="PT+Mono">PT Mono</option>
+                        <option value="Ubuntu+Mono">Ubuntu Mono</option>
+                        <option value="Nanum+Gothic+Coding">Nanum Gothic Coding</option>
+                        <option value="Cousine">Cousine</option>
+                        <option value="Fira+Mono">Fira Mono</option>
+                        <option value="Share+Tech+Mono">Share Tech Mono</option>
+                        <option value="Courier+Prime">Courier Prime</option>
+                        <option value="Fira+Code">Fira Code</option>
+                        <option value="Anonymous+Pro">Anonymous Pro</option>
+                        <option value="Cutive+Mono">Cutive Mono</option>
+                        <option value="VT323">VT323</option>
+                        <option value="JetBrains+Mono">JetBrains Mono</option>
+                        <option value="DM+Mono">DM Mono</option>
+                        <option value="Overpass+Mono">Overpass Mono</option>
+                        <option value="Noto+Sans+Mono">Noto Sans Mono</option>
+                        <option value="Oxygen+Mono">Oxygen Mono</option>
+                        <option value="Nova+Mono">Nova Mono</option>
+                        <option value="Azeret+Mono">Azeret Mono</option>
+                        <option value="B612+Mono">B612 Mono</option>
+                        <option value="Syne+Mono">Syne Mono</option>
+                        <option value="Major+Mono+Display">Major Mono Display</option>
+                        <option value="Xanh+Mono">Xanh Mono</option>
+                        <option value="Red+Hat+Mono">Red Hat Mono</option>
+                        <option value="Fragment+Mono">Fragment Mono</option>
+                        <option value="Spline+Sans+Mono">Spline Sans Mono</option>
+                        <option value="Chivo+Mono">Chivo Mono</option>
+                        <option value="Martian+Mono">Martian Mono</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputFontSize" class="form-label">Font Size</label>
+                    <input id="inputFontSize" name="inputFontSize" class="form-control  form-control-sm" type="number" value="9" step=".1" oninput="updateFont();" />
+                    <span style="margin-left: 2px;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputFontSize" class="form-label">Line Height</label>
+                    <input id="inputLineHeight" name="inputLineHeight" class="form-control  form-control-sm" type="text" value="140%" oninput="updateFont();" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" disabled="disabled" style="display: none;" aria-hidden="true" />
+                    <label for="btRefresh" class="form-label"></label>
+                    <button id="btRefresh" name="btRefresh" value="Refresh" class="btn btn-outline-primary btn-sm" onclick="btRefresh_Click()">
+                        Refresh
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function updateThemeStyle() {
+        let cssfile = document.getElementById("dropStyle").value;
+        let newurl = `/highlight.js/styles/${cssfile}`;
+
+        let link_hljs = document.getElementById("link_hljs");
+        link_hljs.href = newurl;
+    }
+
+    function updateFont(id) {
+        try {
+            let newFont = document.getElementById("dropFont").value;
+            let newFontSize = document.getElementById("inputFontSize").value;
+            let newLineHeight = document.getElementById("inputLineHeight").value;
+
+            let style = document.getElementById("style1");
+
+            let newFontFamily = newFont.replaceAll("+", " ");
+            let newStyle = `
+                        @@import url('https://fonts.googleapis.com/css2?family=${newFont}&display=swap');
+                        pre, code {
+                                font-family: "${newFontFamily}", monospace !important;
+                                font-size: ${newFontSize}pt !important;
+                                line-height: ${newLineHeight} !important;
+                        }`;
+
+            style.textContent = newStyle;
+
+        }
+        catch (err) {
+            alert(err);
+        }
+    }
+    function btRefresh_Click() {
+
+        $('#replacetarget').load('/Preps/TopicList', function () { CollapseAfterLoad('#collapse_1', '#collapse_h_1_1', '#collapse_q_1_1_1'); });
+
+    }
+    $('figure').removeAttr('style');
+    $('figure').find('table').addClass('table table-bordered table-sm');
+   
+</script>

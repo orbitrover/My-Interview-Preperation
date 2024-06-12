@@ -1,0 +1,29 @@
+﻿@model Core.InterviewPrep.PostgreSQL.Models.Answers
+@{
+    Layout = null;
+}
+<link href="~/highlight.js/styles/vs2015.min.css" rel="stylesheet" id="link_hljs_@Model.AnswerId" />
+
+
+
+<div class="content">
+    @Html.Raw(Model.AnswerName)
+</div>
+
+
+<script src="~/highlight.js/highlight.min.js"></script>
+<script src="~/highlight.js/highlightjs-badge.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script>
+
+    // wait for the page to fully loaded
+    window.onload = new function () {
+
+        // set a timer to delay the execution
+        // for waiting highlight.js to complete
+        setTimeout(function () {
+            window.highlightJsBadge();
+        }, 100);
+    }
+
+</script>

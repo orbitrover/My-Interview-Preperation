@@ -1,0 +1,77 @@
+﻿@model Core.InterviewPrep.PostgreSQL.Models.Answers
+@{
+    Layout = null;
+}
+<script src="~/js/ckeditor.js"></script>
+<style>
+    .ck-source-editing-area,
+    .ck-editor__editable {
+        min-height: 400px;
+    }
+
+    .ck-editor__main {
+        height: 400px;
+        overflow-y: scroll;
+        border: 1px solid #bbbbbb;
+    }
+</style>
+<input type="hidden" id="header" value="Edit Answer" />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="EditAnswers">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="AnswerId" />
+            <div class="form-group">
+                <label for="QuestionId" class="control-label">Question Name</label>
+                <select asp-for="QuestionId" class="form-control" asp-items="ViewBag.QuestionId"></select>
+                <span asp-validation-for="QuestionId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AnswerName" class="control-label"></label>
+                <textarea asp-for="AnswerName" class="form-control editor" rows="2">
+
+                </textarea>
+                <span asp-validation-for="AnswerName" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-2">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    ClassicEditor
+        .create(document.querySelector('.editor'), {
+            licenseKey: '',
+            toolbar: {
+                shouldNotGroupWhenFull: true
+            },
+            codeBlock: {
+                languages: [
+                    { language: "plaintext", label: "Plain text" },
+                    { language: "html", label: "HTML" },
+                    { language: "css", label: "CSS" },
+                    { language: "javascript", label: "JavaScript" },
+                    { language: "cs", label: "C#" },
+                    { language: "sql", label: "SQL" },
+                    { language: "json", label: "JSON" },
+                    { language: "c", label: "C" },
+                    { language: "cpp", label: "C++" },
+                    { language: "diff", label: "Diff" },
+                    { language: "java", label: "Java" },
+                    { language: "php", label: "PHP" },
+                    { language: "python", label: "Python" },
+                    { language: "ruby", label: "Ruby" },
+                    { language: "typescript", label: "TypeScript" },
+                    { language: "xml", label: "XML" }
+                ],
+                indentSequence: "    "
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
