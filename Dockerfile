@@ -7,19 +7,14 @@ EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Core.InterviewPrep.PostgreSQL.csproj", "/"]
-RUN dotnet restore "/./Core.InterviewPrep.PostgreSQL.csproj"
-COPY . .
-WORKDIR "/src/Core.InterviewPrep.PostgreSQL"
-RUN dotnet build "./Core.InterviewPrep.PostgreSQL.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /source
+COPY . ./Core.InterviewPrep.PostgreSQL/
+WORKDIR /source/Core.InterviewPrep.PostgreSQL
+RUN dotnet restore
+RUN dotnet publish -c release -o /app --no-restore
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Core.InterviewPrep.PostgreSQL.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# runs it using aspnet runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "Core.InterviewPrep.PostgreSQL.dll"]
