@@ -9,7 +9,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Core.InterviewPrep.PostgreSQL/Core.InterviewPrep.PostgreSQL.csproj", "Core.InterviewPrep.PostgreSQL/"]
+COPY ["Core.InterviewPrep.PostgreSQL.csproj", "Core.InterviewPrep.PostgreSQL/"]
 RUN dotnet restore "./Core.InterviewPrep.PostgreSQL/./Core.InterviewPrep.PostgreSQL.csproj"
 COPY . .
 WORKDIR "/src/Core.InterviewPrep.PostgreSQL"
