@@ -1,38 +1,20 @@
 ﻿
 $.ajaxSetup({ cache: false });
-//------------For Normal Modal View Only---------------------//
-//$("body").on("click", ".data-modal-only", function (event) {
-//    $('#myModal').modal('show');
-//    return false;
 
-//});
-//$("body").on("click", "button[data-dismiss]", function (event) {
-//    $('#myModal').modal('hide');
-//    return false;
-
-//});
-////------------For Partial View Only---------------------//
-//$("body").on("click", ".data-modal-partial", function (event) {
-//    $('#myModalContent').load(this.href, function () {
-//        $('#ModalPartial').modal('show');
-//        bindForm(this);
-//    });
-//    return false;
-
-//});
+var load_spinner = '<span class="spinner-border"></span>';
 var loader_main = '<div class="loader-main" style="display:none">' +
     '<div class="" style="position: absolute;  top: 0;  left: 0;  right: 0;  bottom: 0;background-color: rgba(0,0,0,0.5);  z-index: 99;  cursor: pointer;">' +
-        '<div class="" style="position: absolute;top: 50%;left: 40%;right: 0;bottom: 0;z-index: 9;">' +
-            '<div class="spinner-grow text-muted"></div>' +
-            '<div class="spinner-grow text-primary"></div>' +
-            '<div class="spinner-grow text-success"></div>' +
-            '<div class="spinner-grow text-info"></div>' +
-            '<div class="spinner-grow text-warning"></div>' +
-            '<div class="spinner-grow text-danger"></div>' +
-            '<div class="spinner-grow text-secondary"></div>' +
-            '<div class="spinner-grow text-dark"></div>' +
-            '<div class="spinner-grow text-light"></div>' +
-        '</div>' +
+    '<div class="" style="position: absolute;top: 50%;left: 40%;right: 0;bottom: 0;z-index: 9;">' +
+    '<div class="spinner-grow text-muted"></div>' +
+    '<div class="spinner-grow text-primary"></div>' +
+    '<div class="spinner-grow text-success"></div>' +
+    '<div class="spinner-grow text-info"></div>' +
+    '<div class="spinner-grow text-warning"></div>' +
+    '<div class="spinner-grow text-danger"></div>' +
+    '<div class="spinner-grow text-secondary"></div>' +
+    '<div class="spinner-grow text-dark"></div>' +
+    '<div class="spinner-grow text-light"></div>' +
+    '</div>' +
     '</div>' +
     '</div>';
 var myModalHtml = '<div id="myDynamicModal" class="modal fade">' +
@@ -96,9 +78,10 @@ $(function () {
         $(document).on('click', 'a[data-modal-delete]', function (e) {
             $(this).find('i').hide();
             $(this).find('span').show();
+            var replaceId = $(this).attr('data-modal-replace');
             createAccordianTargets(this, 'ac');
             if (confirm('are you sure to delete this?')) {
-                deleteForm(this.href, myDynamicModal);
+                deleteForm(this.href, myDynamicModal, replaceId);
             }
             else {
                 $(this).find('i').show();
@@ -107,33 +90,36 @@ $(function () {
             return false;
         });
         $(document).on('click', 'a[data-modal]', function (e) {
-            createAccordianTargets(this,'ac');
+            createAccordianTargets(this, 'ac');
+            var replaceId = $(this).attr('data-modal-replace');
             $('#myModalContent').load(this.href, function () {
                 var header = $(this).find('#header').val();
                 $('#myDynamicModal .modal-header h4').html(header)
                 myDynamicModal.show();
-                bindForm(this, myDynamicModal);
+                bindForm(this, myDynamicModal, replaceId);
             });
             return false;
         });
 
         $(document).on('click', 'a[data-modal-p]', function (e) {
             createAccordianTargets(this, 'ac');
+            var replaceId = $(this).attr('data-modal-replace');
             $('#myModalContent2').load(this.href, function () {
                 var header = $(this).find('#header').val();
                 $('#myDynamicModal2 .modal-header h4').html(header)
                 myDynamicModal2.show();
-                bindForm(this, myDynamicModal2);
+                bindForm(this, myDynamicModal2, replaceId);
             });
             return false;
         });
         $(document).on('click', 'a[data-modal-c]', function (e) {
             createAccordianTargets(this, 'ac');
+            var replaceId = $(this).attr('data-modal-replace');
             $('#myModalContent3').load(this.href, function () {
                 var header = $(this).find('#header').val();
                 $('#myDynamicModal3 .modal-header h4').html(header)
                 myDynamicModal3.show();
-                bindForm(this, myDynamicModal3);
+                bindForm(this, myDynamicModal3, replaceId);
             });
             return false;
         });
@@ -158,7 +144,7 @@ function CommonModal(obj, href) {
     });
     return false;
 }
-function bindForm(dialog, modal) {
+function bindForm(dialog, modal, replaceId) {
     $('form', dialog).submit(function () {
 
         $.ajax({
@@ -171,7 +157,10 @@ function bindForm(dialog, modal) {
                     if (result.msgType == 'success') {
                         toastr.success(result.msg);
                         if (result.url != '') {
-                            $('#replacetarget').load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
+                            if (replaceId != undefined && replaceId.length > 0)
+                                $(replaceId).load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
+                            else
+                                $('#replacetarget').load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
                         }
                         modal.hide();
                     }
@@ -185,7 +174,6 @@ function bindForm(dialog, modal) {
             },
             error: function () {
                 toastr.error("Oops..! something went wrong, try again later");
-                $('#myModalContent').html(result);
                 bindForm(dialog);
             }
         });
@@ -194,7 +182,7 @@ function bindForm(dialog, modal) {
 
 }
 
-function deleteForm(_url, modal) {
+function deleteForm(_url, modal, replaceId) {
     $.ajax({
         url: _url,
         type: 'Post',
@@ -203,7 +191,10 @@ function deleteForm(_url, modal) {
                 if (result.msgType == 'success') {
                     toastr.success(result.msg);
                     if (result.url != '') {
-                        $('#replacetarget').load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
+                        if (replaceId != undefined && replaceId.length > 0)
+                            $(replaceId).load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
+                        else
+                            $('#replacetarget').load(result.url, function () { CollapseAfterLoad(topic_target, heading_target, question_target) });
                     }
                     modal.hide();
                 }
@@ -221,7 +212,7 @@ function deleteForm(_url, modal) {
             toastr.error("Error..! something went wrong, try again later");
             obj.find('i').show();
             obj.find('span').hide();
-            
+
         }
     });
     return false;
@@ -234,10 +225,12 @@ $(document)
     })
     .ajaxStop(function () {
         $('input[type="submit"]').prop('disabled', false);
-        $('.loader-main').hide();
+        //$('.loader-main').hide();
+        $('.spinner-border').hide();
     }).ajaxError(function () {
         $('input[type="submit"]').prop('disabled', false);
-        $('.loader-main').hide();
+        //$('.loader-main').hide();
+        $('.spinner-border').hide();
     });
 
 $(document).on('change', '[data-ajax-select]', function () {
@@ -297,6 +290,20 @@ if ($('body').find('img').length > 0) {
     });
 }
 
+$(document).on("click", 'a', function () {
+    
+    var findspinner = $(this).find('.spinner-border');
+    $this = $(this);
+    if (findspinner.length == 0) {
+        $this.append(load_spinner);
+    }
+    else {
+        $this.find('.spinner-border').show();
+    }
+    window.setTimeout(function () {
+        $this.find('.spinner-border').hide();
+    }, 300)
+});
 
 $(function () {
     //$('.loader-main').hide();

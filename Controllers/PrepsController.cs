@@ -1,9 +1,11 @@
 ﻿using Core.InterviewPrep.PostgreSQL.Data;
 using Core.InterviewPrep.PostgreSQL.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Core.InterviewPrep.PostgreSQL.Controllers
 {
@@ -11,10 +13,25 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
     public class PrepsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public PrepsController(ApplicationDbContext context)
+        private readonly IMemoryCache _cache;
+        private readonly string _userId;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        public PrepsController(ApplicationDbContext context, IMemoryCache cache, SignInManager<IdentityUser> SignInManager)
         {
             _context = context;
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _signInManager = SignInManager;
+            _userId = Getuserid();
+        }
+        public string Getuserid()
+        {
+            var userId = "";
+            if (User != null && _signInManager.IsSignedIn(User))
+            {
+                var item = _signInManager.UserManager.FindByNameAsync(User.Identity.Name).Result;
+                userId = item.Id;
+            }
+            return userId;
         }
         // GET: Master
         public async Task<IActionResult> Index()
@@ -31,21 +48,15 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             return PartialView("_HighlightFilter");
         }
         #region Topics
-        public async Task<IActionResult> TopicList()
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new string[] { "id", "eventtype" }, VaryByHeader = "User-Agent")]
+        public async Task<IActionResult> TopicList(int? id, string eventtype = null)
         {
-
-            List<Headings> headings = new List<Headings>();
-
-            var topics = _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1).Include(h=> h.Headings).ThenInclude(q => q.Questions).ThenInclude(a => a.Answers).ToList();
-
-            //foreach (var topic in topics)
-            //{
-            //    var heading = await _context.Headings.Where(x => x.TopicId == topic.Id).Include(q => q.Questions).ThenInclude(a => a.Answers).ToListAsync();
-            //    headings.AddRange(heading);
-            //}
-
-            //ViewData["Headings"] = headings;
-
+            List<ValueTypeMaster> topics;
+            if (id > 0)
+                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && x.Id == id && x.CreatedBy == Getuserid()).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
+            else
+                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && x.CreatedBy == Getuserid()).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
+            ViewData["TopicId"] = id;
             return View(topics);
         }
         // GET: Master/AddTopics
@@ -63,15 +74,15 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             try
             {
-                //topic.ValueTypeGroupId = 1001;
+                topic.CreatedBy = Getuserid();
                 _context.Add(topic);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList?eventtype=Add" });
             }
-            return Json(new { msg = "Topic Created Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Topic Created Successfully", msgType = "success", Url = "/Preps/TopicList?eventtype=Add" });
         }
 
         // GET: Master/EditTopics
@@ -86,20 +97,20 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         // POST: Master/EditTopics
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTopics([Bind("Id,ValueTypeGroupId,Name,Description")] ValueTypeMaster topic)
+        public async Task<IActionResult> EditTopics([Bind("Id,ValueTypeGroupId,Name,Description, CreatedBy, CreatedDate")] ValueTypeMaster topic)
         {
             try
             {
-                topic.ModifiedBy = "2";
+                topic.ModifiedBy = Getuserid();
                 topic.ModifiedDate = DateTime.Now;
                 _context.Update(topic);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList?eventtype=Edit" });
             }
-            return Json(new { msg = "Topic Updated Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Topic Updated Successfully", msgType = "success", Url = "/Preps/TopicList?eventtype=Edit" });
         }
 
         // POST: Master/DeleteTopics
@@ -114,12 +125,23 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList?eventtype=Delete" });
             }
-            return Json(new { msg = "Topic Deleted Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Topic Deleted Successfully", msgType = "success", Url = "/Preps/TopicList?eventtype=Delete" });
         }
         #endregion;
         #region Headings
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "id" })]
+        public async Task<IActionResult> HeadingList(int? id)
+        {
+            List<Headings> headings;
+            if (id > 0)
+                headings = await _context.Headings.Where(x => x.TopicId == id && x.CreatedBy == Getuserid()).ToListAsync();
+            else
+                headings = await _context.Headings.Where(x => x.CreatedBy == Getuserid()).ToListAsync();
+            ViewData["TopicId"] = id;
+            return View(headings);
+        }
         // GET: Master/AddHeadings
         public IActionResult AddHeadings(int? id)
         {
@@ -134,14 +156,16 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             try
             {
+                heading.CreatedBy = Getuserid();
                 _context.Add(heading);
                 await _context.SaveChangesAsync();
+                heading = await _context.Headings.Where(x => x.HeadingId == heading.HeadingId).Include(t => t.Topic).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/HeadingList/" + heading.TopicId });
             }
-            return Json(new { msg = "Heading Created Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Heading Created Successfully", msgType = "success", Url = "/Preps/HeadingList/" + heading.TopicId });
         }
 
         // GET: Master/EditQuestions
@@ -156,41 +180,56 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         // POST: Master/EditHeadings
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditHeadings([Bind("HeadingId,TopicId,HeadingName")] Headings heading)
+        public async Task<IActionResult> EditHeadings([Bind("HeadingId,TopicId,HeadingName, CreatedBy, CreatedDate")] Headings heading)
         {
             try
             {
-                heading.ModifiedBy = "2";
+                heading.ModifiedBy = Getuserid();
                 heading.ModifiedDate = DateTime.Now;
                 _context.Update(heading);
                 await _context.SaveChangesAsync();
+                heading = await _context.Headings.Where(x => x.HeadingId == heading.HeadingId).Include(t => t.Topic).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/HeadingList/" + heading.TopicId });
             }
-            return Json(new { msg = "Heading Updated Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Heading Updated Successfully", msgType = "success", Url = "/Preps/HeadingList/" + heading.TopicId });
         }
 
         // POST: Master/DeleteHeadings
         [HttpPost]
         public async Task<IActionResult> DeleteHeadings(int id)
         {
+            Headings heading = new Headings();
             try
             {
-                var heading = await _context.Headings.Where(x => x.HeadingId == id).SingleOrDefaultAsync();
+                heading = await _context.Headings.Where(x => x.HeadingId == id).SingleOrDefaultAsync();
                 _context.Remove(heading);
                 await _context.SaveChangesAsync();
+                heading = await _context.Headings.Where(x => x.HeadingId == id).Include(t => t.Topic).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/HeadingList/" + heading.TopicId });
             }
-            return Json(new { msg = "Heading Deleted Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Heading Deleted Successfully", msgType = "success", Url = "/Preps/HeadingList/" + heading.TopicId });
         }
 
         #endregion;
         #region Questions
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "id", "topicId" })]
+        public async Task<IActionResult> QuestionList(int? id, int? topicId)
+        {
+            List<Questions> questions;
+            if (id > 0)
+                questions = await _context.Questions.Where(x => x.HeadingId == id && x.CreatedBy == Getuserid()).ToListAsync();
+            else
+                questions = await _context.Questions.Where(x => x.CreatedBy == Getuserid()).ToListAsync();
+            ViewData["TopicId"] = topicId;
+            ViewData["HeadingId"] = id;
+            return View(questions);
+        }
         // GET: Master/AddQuestions
         public IActionResult AddQuestions(int? id)
         {
@@ -205,14 +244,16 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             try
             {
+                question.CreatedBy = Getuserid();
                 _context.Add(question);
                 await _context.SaveChangesAsync();
+                question = await _context.Questions.Where(x => x.QuestionId == question.QuestionId).Include(h => h.Heading).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
             }
-            return Json(new { msg = "Question Created Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Question Created Successfully", msgType = "success", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
         }
 
         // GET: Master/EditQuestions
@@ -228,40 +269,57 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         // POST: Master/EditQuestions
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditQuestions([Bind("QuestionId,HeadingId,QuestionName")] Questions question)
+        public async Task<IActionResult> EditQuestions([Bind("QuestionId,HeadingId,QuestionName, CreatedBy, CreatedDate")] Questions question)
         {
             try
             {
-                question.ModifiedBy = "2";
+                question.ModifiedBy = Getuserid();
                 question.ModifiedDate = DateTime.Now;
                 _context.Update(question);
                 await _context.SaveChangesAsync();
+                question = await _context.Questions.Where(x => x.QuestionId == question.QuestionId).Include(h => h.Heading).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
             }
-            return Json(new { msg = "Question Updated Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Question Updated Successfully", msgType = "success", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
         }
 
         // POST: Master/DeleteQuestions
         [HttpPost]
         public async Task<IActionResult> DeleteQuestions(int id)
         {
+            Questions question = new Questions();
             try
             {
-                var question = await _context.Questions.Where(x => x.QuestionId == id).SingleOrDefaultAsync();
+                question = await _context.Questions.Where(x => x.QuestionId == id).SingleOrDefaultAsync();
                 _context.Remove(question);
                 await _context.SaveChangesAsync();
+                question = await _context.Questions.Where(x => x.QuestionId == id).Include(h => h.Heading).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
             }
-            return Json(new { msg = "Answer Deleted Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Answer Deleted Successfully", msgType = "success", Url = "/Preps/QuestionList?id=" + question.HeadingId + "&topicId=" + question.Heading.TopicId });
         }
         #endregion;
         #region Answers
+        //[OutputCache(Duration = 180, NoStore = false, PolicyName = "ansExipire180", VaryByRouteValueNames = new[] { "id,headingId,topicId" })]
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new[] { "id", "headingId", "topicId" })]
+        public async Task<IActionResult> AnswerList(int? id, int? headingId, int? topicId)
+        {
+            List<Answers> Answers;
+            if (id > 0)
+                Answers = await _cache.GetOrCreateAsync("AnswerList_" + id, async entry => await (from ans in _context.Answers.Where(x => x.QuestionId == id && x.CreatedBy == Getuserid()) select ans).ToListAsync());
+            else
+                Answers = await _cache.GetOrCreateAsync("AnswerList_" + id, async entry => await (from ans in _context.Answers.Where(x => x.CreatedBy == Getuserid()) select ans).ToListAsync());
+            ViewData["TopicId"] = topicId;
+            ViewData["HeadingId"] = headingId;
+            ViewData["QuestionId"] = id;
+            return View(Answers);
+        }
         // GET: Master/AddAnswers
         public IActionResult AddAnswers(int? id)
         {
@@ -276,14 +334,17 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             try
             {
+                answer.CreatedBy = Getuserid();
                 _context.Add(answer);
                 await _context.SaveChangesAsync();
+                answer = await _context.Answers.Where(x => x.AnswerId == answer.AnswerId).Include(q => q.Question).ThenInclude(h => h.Heading).SingleOrDefaultAsync();
+                _cache.Remove("AnswerList_" + answer.QuestionId);
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
             }
-            return Json(new { msg = "Answer Created Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Answer Created Successfully", msgType = "success", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
         }
 
         // GET: Master/EditAnswers
@@ -299,37 +360,42 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         // POST: Master/EditAnswers
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAnswers([Bind("AnswerId,QuestionId,AnswerName")] Answers answer)
+        public async Task<IActionResult> EditAnswers([Bind("AnswerId,QuestionId,AnswerName, CreatedBy, CreatedDate")] Answers answer)
         {
             try
             {
-                answer.ModifiedBy = "2";
+                answer.ModifiedBy = Getuserid();
                 answer.ModifiedDate = DateTime.Now;
                 _context.Update(answer);
                 await _context.SaveChangesAsync();
+                answer = await _context.Answers.Where(x => x.AnswerId == answer.AnswerId).Include(q => q.Question).ThenInclude(h => h.Heading).SingleOrDefaultAsync();
+                _cache.Remove("AnswerList_" + answer.QuestionId);
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
             }
-            return Json(new { msg = "Answer Updated Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Answer Updated Successfully", msgType = "success", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
         }
 
         // POST: Master/DeleteAnswers
         [HttpPost]
         public async Task<IActionResult> DeleteAnswers(int id)
         {
+            Answers answer = new Answers();
             try
             {
-                var answer = await _context.Answers.Where(x => x.AnswerId == id).SingleOrDefaultAsync();
+                answer = await _context.Answers.Where(x => x.AnswerId == id).SingleOrDefaultAsync();
                 _context.Remove(answer);
                 await _context.SaveChangesAsync();
+                answer = await _context.Answers.Where(x => x.AnswerId == id).Include(q => q.Question).ThenInclude(h => h.Heading).SingleOrDefaultAsync();
+                _context.Remove("AnswerList_" + answer.QuestionId);
             }
             catch (Exception ex)
             {
-                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/TopicList" });
+                return Json(new { msg = "Exception: " + ex.Message, msgType = "error", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
             }
-            return Json(new { msg = "Answer Deleted Successfully", msgType = "success", Url = "/Preps/TopicList" });
+            return Json(new { msg = "Answer Deleted Successfully", msgType = "success", Url = "/Preps/AnswerList?id=" + answer.QuestionId + "&headingId=" + answer.Question.HeadingId + "&topicId=" + answer.Question.Heading.TopicId });
         }
         #endregion;
     }

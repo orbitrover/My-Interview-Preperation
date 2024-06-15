@@ -21,6 +21,8 @@
         <form asp-action="EditAnswers">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="AnswerId" />
+            <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="CreatedDate" />
             <div class="form-group">
                 <label for="QuestionId" class="control-label">Question Name</label>
                 <select asp-for="QuestionId" class="form-control" asp-items="ViewBag.QuestionId"></select>

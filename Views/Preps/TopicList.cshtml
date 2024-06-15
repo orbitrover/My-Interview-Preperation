@@ -4,6 +4,10 @@
     Layout = null;
 }
 
+@{
+    Layout = null;
+}
+
 <style>
     .topic-index {
         position: absolute;
@@ -44,6 +48,8 @@
     }
 </style>
 <style type="text/css">
+   
+
     .content {
         padding: 10px;
     }
@@ -51,8 +57,9 @@
     img {
         max-width: 100%;
     }
+
     figure img {
-        max-width:100%;
+        max-width: 100%;
     }
 </style>
 <style id="style1" type="text/css">
@@ -120,37 +127,38 @@
         <h2>
             Index
         </h2>
-        <ol>
+        <ol class="navbar navbar-light bg-light flex-column align-items-stretch p-3" id="accordionOL">
             @if (Model != null && Model.Count() > 0)
             {
-                int count = 0;
+                int count = 0; int i = 0;
                 foreach (var item in Model)
                 {
-                    count++;
+                    count = item.Id; i++;
                     <li>
-                        <a class="text-primary" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic">
+                        <a class="text-primary" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic" id="open_heading_@count" data-accordion-target="#addHeadings_@count" data-accordion-id="@item.Id">
                             @item.Name
                         </a>
-                        <ol>
+                        <ol id="collapse_@count" class="collapse" data-bs-parent="#accordionOL">
+
                             @if (item.Headings != null && item.Headings.Count > 0)
                             {
                                 int countHeading = 0;
                                 foreach (var heading in item.Headings)
                                 {
-                                    countHeading++;
+                                    countHeading = heading.HeadingId;
                                     <li>
-                                        <a class="text-secondary" data-bs-toggle="collapse" data-bs-target="#collapse_h_@count.ToString()_@countHeading" data-bs-type="heading">
+                                        <a class="text-secondary" data-bs-toggle="collapse" data-bs-target="#collapse_h_@count.ToString()_@countHeading" data-bs-type="heading" id="open_question_@countHeading" data-accordion-target="#addQuestions_@countHeading" data-accordion-id="@heading.HeadingId">
                                             @heading.HeadingName
                                         </a>
-                                        <ol>
+                                        <ol id="collapse_h_@count.ToString()_@countHeading" class="collapse" data-bs-parent="#collapse_@count">
                                             @if (heading != null && heading?.Questions.Count > 0)
                                             {
                                                 int countQuestion = 0;
                                                 foreach (var question in heading?.Questions)
                                                 {
-                                                    countQuestion++;
+                                                    countQuestion = question.QuestionId;
                                                     <li>
-                                                        <a class="text-info" data-bs-toggle="collapse" data-bs-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question">
+                                                        <a class="text-info" data-bs-toggle="collapse" data-bs-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-bs-parent="#addQuestions_@countHeading" data-bs-type="question" id="open_answer_@countQuestion" data-accordion-target="#addAnswers_@countQuestion" data-accordion-id="@question.QuestionId">
                                                             @question.QuestionName
                                                         </a>
                                                     </li>
@@ -188,21 +196,21 @@
             </div>
         </h2>
 
-        <div class="mt-1" id="accordion">
+        <div id="accordion" data-bs-spy="scroll" data-bs-target="#accordionOL" data-bs-offset="0" tabindex="0">
 
             @if (Model != null && Model.Count() > 0)
             {
-                int count = 0;
+                int count = 0; int i = 0;
                 foreach (var item in Model)
                 {
-                    count++;
+                    count = item.Id; i++;
                     <div class="card card-topic" id="accordion_@count">
                         <div class="card-header">
-                            <a class="col-topic btn" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic">
-                                <b>@count.</b> @item.Name
+                            <a class="col-topic btn" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic" id="open_heading_@count" data-accordion-target="#addHeadings_@count" data-accordion-id="@item.Id">
+                                <b>@i.</b> @item.Name
                             </a>
                             <div style="float: right;">
-                                <a href="/preps/AddHeadings/@item.Id" class="btn btn-outline-primary btn-xs" data-modal="" title="Add Headings" data-ac-target="#collapse_@count" data-ac-type="topic">
+                                <a href="/preps/AddHeadings/@item.Id" class="btn btn-outline-primary btn-xs" data-modal="" data-modal-replace="#addHeadings_@count" title="Add Headings" data-ac-target="#collapse_@count" data-ac-type="topic">
                                     <i class="fa fa-plus"></i>
                                 </a>
                                 <a href="/preps/EditTopics/@item.Id" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Topic" data-ac-target="#collapse_@count" data-ac-type="topic">
@@ -215,153 +223,167 @@
                             </div>
                         </div>
                         <div id="collapse_@count" class="collapse @(count == 1? "not-show":"") heading" data-bs-parent="#accordion">
-                            <div class="card-body">
-                                @if (item.Headings != null && item.Headings.Count > 0)
-                                {
-                                    int countHeading = 0;
-                                    foreach (var heading in item.Headings)
-                                    {
-                                        countHeading++;
-                                        <div class="card card-heading" id="accordion_@countHeading">
-                                            <div class="card-header">
-                                                <a class="col-heading collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_h_@count.ToString()_@countHeading" data-bs-type="heading">
-                                                    <b>@countHeading.</b>  @heading.HeadingName
-                                                </a>
-
-                                                <div style="float: right;">
-                                                    <a href="/preps/AddQuestions/@heading.HeadingId" class="btn btn-outline-primary btn-xs" data-modal="" title="Add Questions" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
-                                                        <i class="fa fa-plus"></i>
-                                                    </a>
-                                                    <a href="/preps/EditHeadings/@heading.HeadingId" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Heading" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
-                                                        <i class="fa fa-pencil"></i>
-                                                    </a>
-                                                    <a href="/preps/DeleteHeadings/@heading.HeadingId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Heading" data-ac-target="#collapse_@count" data-ac-type="topic">
-                                                        <i class="fa fa-trash"></i>
-                                                        <span class="fa fa-refresh fa-spin" style="display:none;"></span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <div id="collapse_h_@count.ToString()_@countHeading" class="question collapse@(count == 1? "not-show":"")" data-bs-parent="#collapse_@count">
-                                                <div class="card-body">
-                                                    @if (heading != null && heading?.Questions.Count > 0)
-                                                    {
-                                                        int countQuestion = 0;
-                                                        foreach (var question in heading?.Questions)
-                                                        {
-                                                            countQuestion++;
-                                                            <div class="card card-question">
-                                                                <div class="card-header">
-                                                                    <a class="col-question collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question">
-                                                                        <b>@countQuestion.</b> @question.QuestionName
-                                                                    </a>
-                                                                    <div style="float: right;">
-                                                                        <a href="/preps/AddAnswers/@question.QuestionId" class="btn btn-outline-primary btn-xs" data-modal-c="" title="Add Answers" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
-                                                                            <i class="fa fa-plus"></i>
-                                                                        </a>
-                                                                        <a href="/preps/EditQuestions/@question.QuestionId" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Question" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
-                                                                            <i class="fa fa-pencil"></i>
-                                                                        </a>
-                                                                        <a href="/preps/DeleteQuestions/@question.QuestionId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Question" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
-                                                                            <i class="fa fa-trash"></i>
-                                                                            <span class="fa fa-refresh fa-spin" style="display:none;"></span>
-                                                                        </a>
-                                                                    </div>
-
-                                                                </div>
-                                                                <div id="collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" class="collapse @(count == 1? "not-show":"") answer" data-bs-parent="#collapse_h_@countHeading">
-                                                                    <div class="card-body">
-                                                                        @if (question.Answers != null)
-                                                                        {
-                                                                            int countAnswer = 0;
-                                                                            foreach (var answer in question.Answers)
-                                                                            {
-                                                                                countAnswer++;
-                                                                                <div class="row">
-                                                                                    <div class="col-md-12">
-                                                                                        @* <pre class="theme-atom-one-dark shadow-3xl text-sm relative overflow-hidden max-w-full tab-size h-full">
-                                                                                            <b>@countAnswer.</b>
-                                                                                            <code class="language-csharp"> 
-                                                                                                    @Html.Raw(answer.AnswerName)
-                                                                                            </code>
-                                                                                        </pre> *@
-                                                                                        @(await Html.PartialAsync("_HighlightViewer", answer))
-                                                                                        <a href="/preps/EditAnswers/@answer.AnswerId" class="btn btn-outline-warning btn-xs" data-modal-c="" title="Edit Answer" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
-                                                                                            <i class="fa fa-pencil"></i>
-                                                                                        </a>
-                                                                                        <a href="/preps/DeleteAnswers/@answer.AnswerId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Answer" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
-                                                                                            <i class="fa fa-trash"></i>
-                                                                                            <span class="fa fa-refresh fa-spin" style="display:none;"></span>
-                                                                                        </a>
-                                                                                        
-                                                                                    </div>
-                                                                                </div>
-                                                                            }
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                }
-
-
+                            <div class="card-body" id="addHeadings_@count">
                             </div>
+                            <script>
+
+                                // $(function () {
+                                //     hljs.highlightAll();
+                                // });
+                                var topicId = 0;
+                                var result = false;
+                                $(document).on('show.bs.collapse', "#collapse_@count", function () {
+                                    result = true;
+                                });
+                                $(document).on('click', '#open_heading_@count', function () {
+                                    var targetId = $(this).attr('href');
+
+                                    if (result) {
+                                        console.log('topic__@count accordion opened');
+                                        topicId = $(this).attr('data-accordion-id');
+                                        var targetId = $(this).attr('data-accordion-target');
+                                        $(targetId).load('/preps/HeadingList/' + topicId);
+                                    }
+                                    else {
+                                        console.log('topic__@count accordion closed');
+                                    }
+                                    result = false;
+                                });
+                            </script>
                         </div>
                     </div>
                 }
             }
 
 
-
-
-
-
-            @* Sample
-            <div class="card">
-            <div class="card-header">
-            <a class="collapsed btn" data-bs-toggle="collapse" href="#collapseThree">
-            Collapsible Group Item #3
-            </a>
-            </div>
-            <div id="collapseThree" class="collapse" data-bs-parent="#accordion">
-            <div class="card-body">
-            <div class="card">
-            <div class="card-header">
-            <a class="collapsed btn" data-bs-toggle="collapse" href="#collapseThreea">
-            Collapsible Group Item #3
-            </a>
-            </div>
-            <div id="collapseThreea" class="collapse" data-bs-parent="#collapseThree">
-            <div class="card-body">
-            <div class="card">
-            <div class="card-header">
-            <a class="collapsed btn" data-bs-toggle="collapse" href="#collapseThreeb">
-            Collapsible Group Item #3
-            </a>
-            </div>
-            <div id="collapseThreeb" class="collapse" data-bs-parent="#collapseThreea">
-            <div class="card-body">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-            </div>
-
-            *@
         </div>
     </div>
 </div>
-<script>
-    $(function () {
-        hljs.highlightAll();
-    });
-</script>
+
+
+
+
+@* -----Accordian Backup------ *@
+@* <div id="accordion">
+
+    @if (Model != null && Model.Count() > 0)
+    {
+        int count = 0;
+        foreach (var item in Model)
+        {
+            count++;
+            <div class="card card-topic" id="accordion_@count">
+                <div class="card-header">
+                    <a class="col-topic btn" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic">
+                        <b>@count.</b> @item.Name
+                    </a>
+                    <div style="float: right;">
+                        <a href="/preps/AddHeadings/@item.Id" class="btn btn-outline-primary btn-xs" data-modal="" title="Add Headings" data-ac-target="#collapse_@count" data-ac-type="topic">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                        <a href="/preps/EditTopics/@item.Id" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Topic" data-ac-target="#collapse_@count" data-ac-type="topic">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        <a href="/preps/DeleteTopics/@item.Id" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Topic">
+                            <i class="fa fa-trash"></i>
+                            <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                        </a>
+                    </div>
+                </div>
+                <div id="collapse_@count" class="collapse @(count == 1? "not-show":"") heading" data-bs-parent="#accordion">
+                    <div class="card-body">
+                        @if (item.Headings != null && item.Headings.Count > 0)
+                        {
+                            int countHeading = 0;
+                            foreach (var heading in item.Headings)
+                            {
+                                countHeading++;
+                                <div class="card card-heading" id="accordion_@countHeading">
+                                    <div class="card-header">
+                                        <a class="col-heading collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_h_@count.ToString()_@countHeading" data-bs-type="heading">
+                                            <b>@countHeading.</b>  @heading.HeadingName
+                                        </a>
+
+                                        <div style="float: right;">
+                                            <a href="/preps/AddQuestions/@heading.HeadingId" class="btn btn-outline-primary btn-xs" data-modal="" title="Add Questions" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                            <a href="/preps/EditHeadings/@heading.HeadingId" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Heading" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <a href="/preps/DeleteHeadings/@heading.HeadingId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Heading" data-ac-target="#collapse_@count" data-ac-type="topic">
+                                                <i class="fa fa-trash"></i>
+                                                <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div id="collapse_h_@count.ToString()_@countHeading" class="question collapse@(count == 1? "not-show":"")" data-bs-parent="#collapse_@count">
+                                        <div class="card-body">
+                                            @if (heading != null && heading?.Questions.Count > 0)
+                                            {
+                                                int countQuestion = 0;
+                                                foreach (var question in heading?.Questions)
+                                                {
+                                                    countQuestion++;
+                                                    <div class="card card-question">
+                                                        <div class="card-header">
+                                                            <a class="col-question collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question">
+                                                                <b>@countQuestion.</b> @question.QuestionName
+                                                            </a>
+                                                            <div style="float: right;">
+                                                                <a href="/preps/AddAnswers/@question.QuestionId" class="btn btn-outline-primary btn-xs" data-modal-c="" title="Add Answers" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </a>
+                                                                <a href="/preps/EditQuestions/@question.QuestionId" class="btn btn-outline-warning btn-xs" data-modal="" title="Edit Question" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </a>
+                                                                <a href="/preps/DeleteQuestions/@question.QuestionId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Question" data-ac-target="#collapse_h_@count.ToString()_@countHeading" data-ac-type="heading">
+                                                                    <i class="fa fa-trash"></i>
+                                                                    <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                                                                </a>
+                                                            </div>
+
+                                                        </div>
+                                                        <div id="collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" class="collapse @(count == 1? "not-show":"") answer" data-bs-parent="#collapse_h_@countHeading">
+                                                            <div class="card-body">
+                                                                @if (question.Answers != null)
+                                                                {
+                                                                    int countAnswer = 0;
+                                                                    foreach (var answer in question.Answers)
+                                                                    {
+                                                                        countAnswer++;
+                                                                        <div class="row">
+                                                                            <div class="col-md-12">
+                                                                                @(await Html.PartialAsync("_HighlightViewer", answer))
+                                                                                <a href="/preps/EditAnswers/@answer.AnswerId" class="btn btn-outline-warning btn-xs" data-modal-c="" title="Edit Answer" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                                                                                    <i class="fa fa-pencil"></i>
+                                                                                </a>
+                                                                                <a href="/preps/DeleteAnswers/@answer.AnswerId" class="btn btn-outline-danger btn-xs" data-modal-delete="" title="Delete Answer" data-ac-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                                                                                    <i class="fa fa-trash"></i>
+                                                                                    <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                                                                                </a>
+
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+
+</div> *@

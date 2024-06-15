@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Core.InterviewPrep.PostgreSQL.Models.Answers>
+
+@{
+    Layout = null;
+    int topicCount = ViewBag.TopicId != null ? ViewBag.TopicId : 0;
+    int countHeading = ViewBag.HeadingId != null ? ViewBag.HeadingId : 0;
+    int countQuestion = ViewBag.QuestionId != null ? ViewBag.QuestionId : 0;
+    int countAnswer = 0;
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var answer in Model)
+    {
+        //countAnswer++;
+        countAnswer = answer.AnswerId;
+        <div class="row">
+            <div class="col-md-12">
+                @(await Html.PartialAsync("_HighlightViewer", answer))
+                <a href="/preps/EditAnswers/@answer.AnswerId" class="btn btn-outline-warning btn-xs" data-modal-c="" data-modal-replace="#addAnswers_@countQuestion" title="Edit Answer" data-ac-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                    <i class="fa fa-pencil"></i>
+                </a>
+                <a href="/preps/DeleteAnswers/@answer.AnswerId" class="btn btn-outline-danger btn-xs" data-modal-delete="" data-modal-replace="#addAnswers_@countQuestion" title="Delete Answer" data-ac-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                    <i class="fa fa-trash"></i>
+                    <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                </a>
+
+            </div>
+        </div>
+    }
+}
+

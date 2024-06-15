@@ -9,6 +9,8 @@
         <form asp-action="EditQuestions">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="QuestionId" />
+            <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="CreatedDate" />
             <div class="form-group">
                 <label for="HeadingId" class="control-label">Heading Name</label>
                 <select asp-for="HeadingId" class="form-control" asp-items="ViewBag.HeadingId"></select>

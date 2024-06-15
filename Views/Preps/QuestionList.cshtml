@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Core.InterviewPrep.PostgreSQL.Models.Questions>
+@{
+    Layout = null;
+    int topicCount = ViewBag.TopicId != null ? ViewBag.TopicId : 0;
+    int countHeading = ViewBag.HeadingId != null ? ViewBag.HeadingId : 0;
+    int i = 0;
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+    int countQuestion = 0;
+    foreach (var question in Model)
+    {
+        countQuestion = question.QuestionId; i++;
+        <div class="card card-question">
+            <div class="card-header">
+                <a class="col-question collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question" id="open_answer_@countQuestion" data-accordion-target="#addAnswers_@countQuestion" data-accordion-id="@question.QuestionId">
+                    <b>@i.</b> @question.QuestionName
+                </a>
+                <div style="float: right;">
+                    <a href="/preps/AddAnswers/@question.QuestionId" class="btn btn-outline-primary btn-xs" data-modal-c="" data-modal-replace="#addAnswers_@countQuestion" title="Add Answers" data-ac-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                    <a href="/preps/EditQuestions/@question.QuestionId" class="btn btn-outline-warning btn-xs" data-modal="" data-modal-replace="#addQuestions_@countHeading" title="Edit Question" data-ac-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
+                        <i class="fa fa-pencil"></i>
+                    </a>
+                    <a href="/preps/DeleteQuestions/@question.QuestionId" class="btn btn-outline-danger btn-xs" data-modal-delete="" data-modal-replace="#addQuestions_@countHeading" title="Delete Question" data-ac-target="#collapse_h_@topicCount.ToString()_@countHeading" data-ac-type="heading">
+                        <i class="fa fa-trash"></i>
+                        <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                    </a>
+                </div>
+
+            </div>
+            <div id="collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" class="collapse @(topicCount == 1? "not-show":"") answer" data-bs-parent="#addQuestions__@countHeading">
+                <div class="card-body" id="addAnswers_@countQuestion">
+                </div>
+                <script>
+                    var questionId = 0;
+                    var result = false;
+                    $(document).on('show.bs.collapse', "#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion", function () {
+                        result = true;
+                    });
+                    $(document).on('click', '#open_answer_@countQuestion', function () {
+                        var targetId = $(this).attr('href');
+
+                        if (result) {
+                            console.log('question_@topicCount.ToString()_@countHeading.ToString()_@countQuestion accordion opened');
+                            questionId = $(this).attr('data-accordion-id');
+                            var targetId = $(this).attr('data-accordion-target');
+                            $(targetId).load('/preps/AnswerList?id=' + questionId + '&headingId=' + @countHeading+'&topicId=' + @topicCount);
+                        }
+                        else {
+                            console.log('question_@topicCount.ToString()_@countHeading.ToString()_@countQuestion accordion closed');
+                        }
+                        result = false;
+                    });
+                </script>
+            </div>
+        </div>
+    }
+}
+
+

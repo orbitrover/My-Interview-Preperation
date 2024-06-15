@@ -3,13 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - My Interview Preperation</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Interview Prep</title>
+    @*  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <link href="~/lib/bootstrap5.3/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Core.InterviewPrep.PostgreSQL.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Core.InterViewPrep.styles.css" asp-append-version="true" />
     <link href="~/css/jquery-ui.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @*  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    <script src="~/lib/bootstrap5.3/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <link href="~/css/toastr.min.css" rel="stylesheet" />
     <script src="~/js/jquery-ui.js"></script>
@@ -22,6 +24,7 @@
             font-size: .675rem !important;
         }
     </style>
+
 </head>
 <body>
     <header>
@@ -46,18 +49,22 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container" style="max-width:100%;">
+        <main role="main" class="pb-3 mt-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted" style="    position: fixed;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;">
         <div class="container">
             My Interview Preperation  &copy; @(DateTime.Now.Year) - Orbit Rover - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-   
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

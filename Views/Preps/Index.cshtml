@@ -1,7 +1,18 @@
 ﻿@{
     ViewData["Title"] = "My Practices";
 }
+<style>
+    .spinner-border {
+        font-size: 7px !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        color: darkred !important;
+    }
 
+    .footer {
+        display: none;
+    }
+</style>
 <div class="row">
     <div class="col-md-12" id="replacetarget">
     </div>
@@ -9,7 +20,7 @@
 <script>
     var topic_target = ''; var heading_target = ''; var question_target = '';
     $(document).ready(function () {
-        $('#replacetarget').load('/Preps/TopicList', function () { CollapseAfterLoad('#collapse_1', '#collapse_h_1_1', '#collapse_q_1_1_1'); });
+        $('#replacetarget').load('/Preps/TopicList?id=0&eventtype=Get', function () { CollapseAfterLoad('#collapse_1', '#collapse_h_1_1', '#collapse_q_1_1_1'); });
     });
     $(document).on("click", 'a[data-bs-toggle="collapse"]', function () {
         createAccordianTargets(this);

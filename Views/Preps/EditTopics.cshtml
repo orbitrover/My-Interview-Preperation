@@ -9,6 +9,8 @@
         <form asp-action="EditTopics">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="CreatedDate" />
             <div class="form-group">
                 <label asp-for="ValueTypeGroupId" class="control-label"></label>
                 <select asp-for="ValueTypeGroupId" class="form-control" asp-items="ViewBag.ValueTypeGroupId"></select>

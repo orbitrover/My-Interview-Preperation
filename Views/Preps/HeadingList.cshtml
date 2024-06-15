@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Core.InterviewPrep.PostgreSQL.Models.Headings>
+@{
+    Layout = null;
+    int topicCount = ViewBag.TopicId != null ? ViewBag.TopicId : 0;
+    int countHeading = 0;
+    int i = 0;
+}
+
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var heading in Model)
+    {
+        countHeading = heading.HeadingId; i++;
+        <div class="card card-heading" id="accordion_@countHeading">
+            <div class="card-header">
+                <a class="col-heading collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_h_@topicCount.ToString()_@countHeading" data-bs-type="heading" id="open_question_@countHeading" data-accordion-target="#addQuestions_@countHeading" data-accordion-id="@heading.HeadingId">
+                    <b>@i.</b>  @heading.HeadingName
+                </a>
+
+                <div style="float: right;">
+                    <a href="/preps/AddQuestions/@heading.HeadingId" class="btn btn-outline-primary btn-xs" data-modal="" data-modal-replace="#addQuestions_@countHeading" title="Add Questions" data-ac-target="#collapse_h_@topicCount.ToString()_@countHeading" data-ac-type="heading">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                    <a href="/preps/EditHeadings/@heading.HeadingId" class="btn btn-outline-warning btn-xs" data-modal="" data-modal-replace="#addHeadings_@topicCount" title="Edit Heading" data-ac-target="#collapse_h_@topicCount.ToString()_@countHeading" data-ac-type="heading">
+                        <i class="fa fa-pencil"></i>
+                    </a>
+                    <a href="/preps/DeleteHeadings/@heading.HeadingId" class="btn btn-outline-danger btn-xs" data-modal-delete="" data-modal-replace="#addHeadings_@topicCount" title="Delete Heading" data-ac-target="#collapse_@topicCount" data-ac-type="topic">
+                        <i class="fa fa-trash"></i>
+                        <span class="fa fa-refresh fa-spin" style="display:none;"></span>
+                    </a>
+                </div>
+            </div>
+            <div id="collapse_h_@topicCount.ToString()_@countHeading" class="question collapse@(topicCount == 1? "not-show":"")" data-bs-parent="#addHeadings_@topicCount">
+                <div class="card-body" id="addQuestions_@countHeading">
+                </div>
+                <script>
+                    var headingId = 0;
+                    var result = false;
+                    $(document).on('show.bs.collapse', "#collapse_h_@topicCount.ToString()_@countHeading", function () {
+                        result = true;
+                    });
+                    $(document).on('click', '#open_question_@countHeading', function () {
+                        var targetId = $(this).attr('href');
+
+                        if (result) {
+                            console.log('heading_@topicCount.ToString()_@countHeading accordion opened');
+                            headingId = $(this).attr('data-accordion-id');
+                            var targetId = $(this).attr('data-accordion-target');
+                            $(targetId).load('/preps/QuestionList?id=' + headingId + '&topicId=' + @topicCount);
+                        }
+                        else {
+                            console.log('heading_@topicCount.ToString()_@countHeading accordion closed');
+                        }
+                        result = false;
+                    });
+                </script>
+            </div>
+        </div>
+    }
+}
+
+
