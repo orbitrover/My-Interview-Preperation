@@ -102,7 +102,7 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             try
             {
                 topic.ModifiedBy = Getuserid();
-                topic.ModifiedDate = DateTime.Now;
+                topic.ModifiedDate = DateTimeOffset.Now;
                 _context.Update(topic);
                 await _context.SaveChangesAsync();
             }
@@ -185,7 +185,7 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             try
             {
                 heading.ModifiedBy = Getuserid();
-                heading.ModifiedDate = DateTime.Now;
+                heading.ModifiedDate = DateTimeOffset.Now;
                 _context.Update(heading);
                 await _context.SaveChangesAsync();
                 heading = await _context.Headings.Where(x => x.HeadingId == heading.HeadingId).Include(t => t.Topic).SingleOrDefaultAsync();
@@ -274,7 +274,7 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             try
             {
                 question.ModifiedBy = Getuserid();
-                question.ModifiedDate = DateTime.Now;
+                question.ModifiedDate = DateTimeOffset.UtcNow;
                 _context.Update(question);
                 await _context.SaveChangesAsync();
                 question = await _context.Questions.Where(x => x.QuestionId == question.QuestionId).Include(h => h.Heading).SingleOrDefaultAsync();
@@ -365,7 +365,7 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
             try
             {
                 answer.ModifiedBy = Getuserid();
-                answer.ModifiedDate = DateTime.Now;
+                answer.ModifiedDate = DateTimeOffset.Now;
                 _context.Update(answer);
                 await _context.SaveChangesAsync();
                 answer = await _context.Answers.Where(x => x.AnswerId == answer.AnswerId).Include(q => q.Question).ThenInclude(h => h.Heading).SingleOrDefaultAsync();

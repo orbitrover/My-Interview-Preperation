@@ -2,9 +2,9 @@
 {
     public class BaseEntity
     {
-        public DateTime CreatedDate { get; set; }= DateTime.UtcNow;
+        public DateTimeOffset CreatedDate { get; set; } = DateTimeOffset.UtcNow;
         public string CreatedBy { get; set; } = "1";
-        public DateTime? ModifiedDate { get; set; }
+        public DateTimeOffset? ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
         public bool IsActive { get; set; } = true;
 
