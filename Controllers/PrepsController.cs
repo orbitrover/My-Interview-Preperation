@@ -53,9 +53,9 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             List<ValueTypeMaster> topics;
             if (id > 0)
-                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && x.Id == id && x.CreatedBy == Getuserid()).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
+                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && x.Id == id && (x.CreatedBy == "1" || x.CreatedBy == Getuserid())).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
             else
-                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && x.CreatedBy == Getuserid()).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
+                topics = await _context.ValueTypeMaster.Where(x => x.ValueTypeGroupId == 1 && (x.CreatedBy == "1" || x.CreatedBy == Getuserid())).Include(h => h.Headings).ThenInclude(q => q.Questions).ToListAsync();
             ViewData["TopicId"] = id;
             return View(topics);
         }
