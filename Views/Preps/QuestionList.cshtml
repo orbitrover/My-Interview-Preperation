@@ -14,8 +14,10 @@
         countQuestion = question.QuestionId; i++;
         <div class="card card-question">
             <div class="card-header">
-                <a class="col-question collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question" id="open_answer_@countQuestion" data-accordion-target="#addAnswers_@countQuestion" data-accordion-id="@question.QuestionId">
+                <a class="col-question collapsed btn" data-count-url="/preps/countanswers" data-bs-toggle="collapse" data-bs-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-bs-type="question" id="open_answer_@countQuestion" data-accordion-target="#addAnswers_@countQuestion" data-accordion-id="@question.QuestionId">
                     <b>@i.</b> @question.QuestionName
+                    <span class="badge badge-primary" data-bs-toggle="tooltip" title="Answers">0</span>
+                    <span class="spinner-border" style="display: none;"></span>
                 </a>
                 <div style="float: right;">
                     <a href="/preps/AddAnswers/@question.QuestionId" class="btn btn-outline-primary btn-xs" data-modal-c="" data-modal-replace="#addAnswers_@countQuestion" title="Add Answers" data-ac-target="#collapse_q_@topicCount.ToString()_@countHeading.ToString()_@countQuestion" data-ac-type="question">
@@ -60,4 +62,29 @@
     }
 }
 
-
+<script>
+    $(function () {
+        $('.col-question').each(function (key, value) {
+            var Id = $(this).attr('data-accordion-id');
+            var _url = $(this).attr('data-count-url');
+            GetCounts($(this), Id, _url);
+        });
+        function GetCounts(obj, Id, _url) {
+            $.ajax({
+                url: _url,
+                type: 'Get',
+                data: { id: Id },
+                success: function (result) {
+                    debugger;
+                    console.log(obj.html());
+                    console.log('Topic Count: ' + result + ' For Topic Id: ' + Id);
+                    obj.find('.badge').text(result);
+                    $('#badge_' + obj.attr('id')).text(result);
+                },
+                error: function () {
+                    toastr.error('Heading Count Failed');
+                }
+            });
+        }
+    })
+</script>

@@ -47,6 +47,22 @@ namespace Core.InterviewPrep.PostgreSQL.Controllers
         {
             return PartialView("_HighlightFilter");
         }
+        public async Task<IActionResult> countheadings(int id)
+        {
+            var headings = await _context.Headings.Where(x => x.TopicId == id && x.CreatedBy == Getuserid()).ToListAsync();
+            return Json(headings.Count());
+        }
+        public async Task<IActionResult> countquestions(int id)
+        {
+            var questions = await _context.Questions.Where(x => x.HeadingId == id && x.CreatedBy == Getuserid()).ToListAsync();
+            return Json(questions.Count());
+        }
+        public async Task<IActionResult> countanswers(int id)
+        {
+            var answers = await _context.Answers.Where(x => x.QuestionId == id && x.CreatedBy == Getuserid()).ToListAsync();
+            return Json(answers.Count());
+        }
+
         #region Topics
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByQueryKeys = new string[] { "id", "eventtype" }, VaryByHeader = "User-Agent")]
         public async Task<IActionResult> TopicList(int? id, string eventtype = null)

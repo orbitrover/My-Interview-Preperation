@@ -146,13 +146,12 @@ function CommonModal(obj, href) {
 }
 function bindForm(dialog, modal, replaceId) {
     $('form', dialog).submit(function () {
-
+        $('.loader-main').show();
         $.ajax({
             url: this.action,
             type: this.method,
             data: $(this).serialize(),
             success: function (result) {
-                $('.loader-main').hide();
                 if (result.msg != null) {
                     if (result.msgType == 'success') {
                         toastr.success(result.msg);
@@ -171,10 +170,12 @@ function bindForm(dialog, modal, replaceId) {
                 else {
                     bindForm(dialog);
                 }
+                $('.loader-main').hide();
             },
             error: function () {
                 toastr.error("Oops..! something went wrong, try again later");
                 bindForm(dialog);
+                $('.loader-main').hide();
             }
         });
         return false;
@@ -183,6 +184,7 @@ function bindForm(dialog, modal, replaceId) {
 }
 
 function deleteForm(_url, modal, replaceId) {
+    $('.loader-main').show();
     $.ajax({
         url: _url,
         type: 'Post',
@@ -207,12 +209,13 @@ function deleteForm(_url, modal, replaceId) {
             }
             obj.find('i').show();
             obj.find('span').hide();
+            $('.loader-main').hide();
         },
         error: function () {
             toastr.error("Error..! something went wrong, try again later");
             obj.find('i').show();
             obj.find('span').hide();
-
+            $('.loader-main').hide();
         }
     });
     return false;
@@ -222,15 +225,22 @@ $(document)
     .ajaxStart(function () {
         $('input[type="submit"]').prop('disabled', true);
         //$('.loader-main').show();
+        //$('.spinner-border').show();
     })
     .ajaxStop(function () {
-        $('input[type="submit"]').prop('disabled', false);
-        //$('.loader-main').hide();
-        $('.spinner-border').hide();
+        window.setTimeout(function () {
+            $('input[type="submit"]').prop('disabled', false);
+            //$('.loader-main').hide();
+            $('.spinner-border').hide();
+        }, 300);
+
     }).ajaxError(function () {
-        $('input[type="submit"]').prop('disabled', false);
-        //$('.loader-main').hide();
-        $('.spinner-border').hide();
+        window.setTimeout(function () {
+            $('input[type="submit"]').prop('disabled', false);
+            //$('.loader-main').hide();
+            $('.spinner-border').hide();
+        }, 300);
+
     });
 
 $(document).on('change', '[data-ajax-select]', function () {
@@ -291,18 +301,18 @@ if ($('body').find('img').length > 0) {
 }
 
 $(document).on("click", 'a', function () {
-    
     var findspinner = $(this).find('.spinner-border');
     $this = $(this);
     if (findspinner.length == 0) {
-        $this.append(load_spinner);
+        //$this.append(load_spinner);
+
     }
     else {
         $this.find('.spinner-border').show();
     }
     window.setTimeout(function () {
         $this.find('.spinner-border').hide();
-    }, 300)
+    }, 300);
 });
 
 $(function () {

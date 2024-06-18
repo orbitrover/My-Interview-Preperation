@@ -4,10 +4,6 @@
     Layout = null;
 }
 
-@{
-    Layout = null;
-}
-
 <style>
     .topic-index {
         position: absolute;
@@ -48,7 +44,7 @@
     }
 </style>
 <style type="text/css">
-   
+
 
     .content {
         padding: 10px;
@@ -60,6 +56,34 @@
 
     figure img {
         max-width: 100%;
+    }
+
+    .badge-primary {
+        background-color: darkslateblue;
+        font-family: none;
+        left: 10px;
+        margin-right: 15px;
+    }
+
+    .badge-info {
+        background-color: #1b6ec2b0;
+        font-family: none;
+        position: absolute;
+        right: 15px;
+    }
+
+    .badge-warning {
+        background-color: #ce9c07ba;
+        font-family: none;
+        position: absolute;
+        right: 15px;
+    }
+
+    .badge-danger {
+        background-color: #e014289c;
+        font-family: none;
+        position: absolute;
+        right: 15px;
     }
 </style>
 <style id="style1" type="text/css">
@@ -137,6 +161,8 @@
                     <li>
                         <a class="text-primary" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic" id="open_heading_@count" data-accordion-target="#addHeadings_@count" data-accordion-id="@item.Id">
                             @item.Name
+                            <span id="badge_open_heading_@count" class="badge badge-info" data-bs-toggle="tooltip" title="Headings">0</span>
+                            <span class="spinner-border" style="display: none;"></span>
                         </a>
                         <ol id="collapse_@count" class="collapse" data-bs-parent="#accordionOL">
 
@@ -149,6 +175,8 @@
                                     <li>
                                         <a class="text-secondary" data-bs-toggle="collapse" data-bs-target="#collapse_h_@count.ToString()_@countHeading" data-bs-type="heading" id="open_question_@countHeading" data-accordion-target="#addQuestions_@countHeading" data-accordion-id="@heading.HeadingId">
                                             @heading.HeadingName
+                                            <span id="badge_open_question_@countHeading" class="badge badge-warning" data-bs-toggle="tooltip" title="Questions">0</span>
+                                            <span class="spinner-border" style="display: none;"></span>
                                         </a>
                                         <ol id="collapse_h_@count.ToString()_@countHeading" class="collapse" data-bs-parent="#collapse_@count">
                                             @if (heading != null && heading?.Questions.Count > 0)
@@ -160,6 +188,8 @@
                                                     <li>
                                                         <a class="text-info" data-bs-toggle="collapse" data-bs-target="#collapse_q_@count.ToString()_@countHeading.ToString()_@countQuestion" data-bs-parent="#addQuestions_@countHeading" data-bs-type="question" id="open_answer_@countQuestion" data-accordion-target="#addAnswers_@countQuestion" data-accordion-id="@question.QuestionId">
                                                             @question.QuestionName
+                                                            <span id="badge_open_answer_@countQuestion" class="badge badge-danger" data-bs-toggle="tooltip" title="Answers">0</span>
+                                                            <span class="spinner-border" style="display: none;"></span>
                                                         </a>
                                                     </li>
                                                 }
@@ -206,8 +236,10 @@
                     count = item.Id; i++;
                     <div class="card card-topic" id="accordion_@count">
                         <div class="card-header">
-                            <a class="col-topic btn" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic" id="open_heading_@count" data-accordion-target="#addHeadings_@count" data-accordion-id="@item.Id">
+                            <a class="col-topic btn" data-count-url="/preps/countheadings" data-bs-toggle="collapse" data-bs-target="#collapse_@count" data-bs-type="topic" id="open_heading_@count" data-accordion-target="#addHeadings_@count" data-accordion-id="@item.Id">
                                 <b>@i.</b> @item.Name
+                                <span class="badge badge-primary" data-bs-toggle="tooltip" title="Headings">0</span>
+                                <span class="spinner-border" style="display: none;"></span>
                             </a>
                             <div style="float: right;">
                                 <a href="/preps/AddHeadings/@item.Id" class="btn btn-outline-primary btn-xs" data-modal="" data-modal-replace="#addHeadings_@count" title="Add Headings" data-ac-target="#collapse_@count" data-ac-type="topic">
@@ -260,7 +292,31 @@
     </div>
 </div>
 
-
+<script>
+    $(function () {
+        $('.col-topic').each(function (key, value) {
+            var Id = $(this).attr('data-accordion-id');
+            var _url = $(this).attr('data-count-url');
+            GetCounts($(this), Id, _url);
+        });
+        function GetCounts(obj, Id, _url) {
+            $.ajax({
+                url: _url,
+                type: 'Get',
+                data: { id: Id },
+                success: function (result) {
+                    console.log(obj.html());
+                    console.log('Topic Count: ' + result + ' For Topic Id: ' + Id);
+                    obj.find('.badge').text(result);
+                    $('#badge_' + obj.attr('id')).text(result);
+                },
+                error: function () {
+                    toastr.error('Heading Count Failed');
+                }
+            });
+        }
+    })
+</script>
 
 
 @* -----Accordian Backup------ *@

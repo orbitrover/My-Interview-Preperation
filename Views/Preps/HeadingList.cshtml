@@ -13,8 +13,10 @@
         countHeading = heading.HeadingId; i++;
         <div class="card card-heading" id="accordion_@countHeading">
             <div class="card-header">
-                <a class="col-heading collapsed btn" data-bs-toggle="collapse" data-bs-target="#collapse_h_@topicCount.ToString()_@countHeading" data-bs-type="heading" id="open_question_@countHeading" data-accordion-target="#addQuestions_@countHeading" data-accordion-id="@heading.HeadingId">
+                <a class="col-heading collapsed btn" data-count-url="/preps/countquestions" data-bs-toggle="collapse" data-bs-target="#collapse_h_@topicCount.ToString()_@countHeading" data-bs-type="heading" id="open_question_@countHeading" data-accordion-target="#addQuestions_@countHeading" data-accordion-id="@heading.HeadingId">
                     <b>@i.</b>  @heading.HeadingName
+                    <span class="badge badge-primary" data-bs-toggle="tooltip" title="Questions">0</span>
+                    <span class="spinner-border" style="display: none;"></span>
                 </a>
 
                 <div style="float: right;">
@@ -60,3 +62,29 @@
 }
 
 
+<script>
+    $(function () {
+        $('.col-heading').each(function (key, value) {
+            var Id = $(this).attr('data-accordion-id');
+            var _url = $(this).attr('data-count-url');
+            GetCounts($(this), Id, _url);
+        });
+        function GetCounts(obj, Id, _url) {
+            $.ajax({
+                url: _url,
+                type: 'Get',
+                data: { id: Id },
+                success: function (result) {
+                    debugger;
+                    console.log(obj.html());
+                    console.log('Topic Count: ' + result + ' For Topic Id: ' + Id);
+                    obj.find('.badge').text(result);
+                    $('#badge_' + obj.attr('id')).text(result);
+                },
+                error: function () {
+                    toastr.error('Heading Count Failed');
+                }
+            });
+        }
+    })
+</script>
